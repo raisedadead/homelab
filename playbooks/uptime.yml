@@ -1,0 +1,12 @@
+---
+- name: Check uptime on virtual machines
+  hosts: "{{ variable_host | default('cluster') }}"
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Print uptime
+      debug:
+        msg:
+          'Host machine {{ inventory_hostname }} has been up for {{
+          ansible_facts.uptime_seconds/86400 }} days'
