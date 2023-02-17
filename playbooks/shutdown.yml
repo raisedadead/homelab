@@ -1,0 +1,11 @@
+---
+- name: Shutdown the Cluster
+  hosts: cluster
+  become: true
+
+  tasks:
+    - name: Shutdown the machine
+      command: shutdown -h now
+      async: 1
+      poll: 0
+      ignore_errors: true
