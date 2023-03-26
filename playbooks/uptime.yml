@@ -8,5 +8,8 @@
     - name: Print uptime
       debug:
         msg:
-          'Host machine {{ inventory_hostname }} has been up for {{
-          ansible_facts.uptime_seconds/86400 }} days'
+          - 'Uptime stats for {{ inventory_hostname }}.'
+          - 'Seconds: {{ ansible_facts.uptime_seconds }} seconds.'
+          - 'Minutes: {{ ansible_facts.uptime_seconds/60 }} minutes.'
+          - 'Hours: {{ ansible_facts.uptime_seconds/3600 }} hours.'
+          - 'Days: {{ ansible_facts.uptime_seconds/86400 }} days.'
