@@ -1,0 +1,37 @@
+---
+- name: Update all software on a host
+  hosts: "{{ variable_host | default('cluster') }}"
+  become: true
+  become_method: sudo
+  serial: 1
+
+  tasks:
+    - name: Update apt repo and cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Autoclean old packages
+      apt:
+        autoclean: yes
+        force_apt_get: yes
+
+    - name: Autoremove unused packages
+      apt:
+        autoremove: yes
+        force_apt_get: yes
+
+    - name: Reboot the machine
+      reboot:
+        reboot_timeout: 600
+        connect_timeout: 60
+        pre_reboot_delay: 5
+        post_reboot_delay: 5
+        test_command: uptime
+        msg: 'Rebooting the machine to apply all updates'
