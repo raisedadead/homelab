@@ -1,11 +1,11 @@
 ---
-- name: Shutdown the Cluster
-  hosts: cluster
+- name: Shutdown
+  hosts: "{{ variable_host | default('cluster') }}"
   become: true
 
   tasks:
     - name: Shutdown the machine
-      command: shutdown -h now
+      command: shutdown {{ var_reboot | default('-h') }} now
       async: 1
       poll: 0
       ignore_errors: true
