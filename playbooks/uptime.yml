@@ -1,5 +1,5 @@
 ---
-- name: Check uptime on virtual machines
+- name: Check Uptime
   hosts: "{{ variable_host | default('cluster') }}"
   become: true
   become_method: sudo
