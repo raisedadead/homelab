@@ -6,10 +6,10 @@
 
   tasks:
     - name: Print uptime
-      debug:
+      ansible.builtin.debug:
         msg:
           - 'Uptime stats for {{ inventory_hostname }}.'
           - 'Seconds: {{ ansible_facts.uptime_seconds }} seconds.'
-          - 'Minutes: {{ ansible_facts.uptime_seconds/60 }} minutes.'
-          - 'Hours: {{ ansible_facts.uptime_seconds/3600 }} hours.'
-          - 'Days: {{ ansible_facts.uptime_seconds/86400 }} days.'
+          - 'Minutes: {{ ansible_facts.uptime_seconds / 60 }} minutes.'
+          - 'Hours: {{ ansible_facts.uptime_seconds / 3600 }} hours.'
+          - 'Days: {{ ansible_facts.uptime_seconds / 86400 }} days.'
