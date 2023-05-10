@@ -24,10 +24,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
@@ -37,7 +37,7 @@ jobs:
 
       - name: Post Format
         if: always() && github.ref != 'refs/heads/main' && (steps.fmt.outcome == 'success' || steps.fmt.outcome == 'failure')
-        uses: GetTerminus/terraform-pr-commenter@v2
+        uses: GetTerminus/terraform-pr-commenter@e86dd74eb198208c55079399c2f6cc12e44e333a # v2
         with:
           commenter_type: fmt
           commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
@@ -50,7 +50,7 @@ jobs:
 
       - name: Post Init
         if: always() && github.ref != 'refs/heads/main' && (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
-        uses: GetTerminus/terraform-pr-commenter@v2
+        uses: GetTerminus/terraform-pr-commenter@e86dd74eb198208c55079399c2f6cc12e44e333a # v2
         with:
           commenter_type: init
           commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
@@ -63,7 +63,7 @@ jobs:
 
       - name: Post Validate
         if: always() && github.ref != 'refs/heads/main' && (steps.validate.outcome == 'success' || steps.validate.outcome == 'failure')
-        uses: GetTerminus/terraform-pr-commenter@v2
+        uses: GetTerminus/terraform-pr-commenter@e86dd74eb198208c55079399c2f6cc12e44e333a # v2
         with:
           commenter_type: validate
           commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Post Plan
         if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
-        uses: GetTerminus/terraform-pr-commenter@v2
+        uses: GetTerminus/terraform-pr-commenter@e86dd74eb198208c55079399c2f6cc12e44e333a # v2
         with:
           commenter_type: plan
           commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
