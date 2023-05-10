@@ -1,5 +1,12 @@
-# Ansible playbooks for my DeskPi Super6C Cluster
+# Homelab
 
-Ansible playbooks to manage my DeskPi Super6C which are populated with Raspberry Pi Compute Module 4 of various flavours.
+> Ansible playbooks to manage my homelab.
 
-These are inspired by work Jeff Geerling's work and videos.
+**Clusters:**
+
+- **DeskPi Super6C**-based Cluster, populated with different variants of
+  Raspberry Pi Compute Module 4.
+- **Proxmox VE**-based virtual machines running on Dell XPS 15 (2020) 9500
+  laptop.
+
+_Inspired by work Jeff Geerling's work and videos._
