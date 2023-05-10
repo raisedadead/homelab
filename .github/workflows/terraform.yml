@@ -31,10 +31,6 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Terraform Version
-        id: terraform_version
-        run: echo "TERRAFORM_VERSION=$(terraform version -json | jq -r '.terraform_version')" >> $GITHUB_OUTPUT
-
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check
@@ -46,7 +42,7 @@ jobs:
           commenter_type: fmt
           commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
           commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
-          terraform_version: ${{ steps.terraform_version.outputs.TERRAFORM_VERSION }}
+          terraform_version: 1.4
 
       - name: Terraform Init
         id: init
@@ -59,7 +55,7 @@ jobs:
           commenter_type: init
           commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
           commenter_exitcode: ${{ steps.init.outputs.exitcode }}
-          terraform_version: ${{ steps.terraform_version.outputs.TERRAFORM_VERSION }}
+          terraform_version: 1.4
 
       - name: Terraform Validate
         id: validate
@@ -72,7 +68,7 @@ jobs:
           commenter_type: validate
           commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
           commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
-          terraform_version: ${{ steps.terraform_version.outputs.TERRAFORM_VERSION }}
+          terraform_version: 1.4
 
       - name: Terraform Plan
         id: plan
@@ -87,7 +83,7 @@ jobs:
           commenter_type: plan
           commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
           commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
-          terraform_version: ${{ steps.terraform_version.outputs.TERRAFORM_VERSION }}
+          terraform_version: 1.4
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
