@@ -16,12 +16,12 @@ resource "cloudflare_record" "pve-a-192-168-2-10" {
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
-resource "cloudflare_record" "hello-a-192-168-2-100" {
+resource "cloudflare_record" "hello-a-192-168-2-200" {
   name    = "hello"
   proxied = false
   ttl     = 1
   type    = "A"
-  value   = "192.168.2.100"
+  value   = "192.168.2.200"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
