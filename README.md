@@ -1,6 +1,6 @@
 # Homelab
 
-> Infrastructure as code for my homelab.
+> Infrastructure as code for my home lab.
 
 **Clusters:**
 
