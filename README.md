@@ -1,6 +1,6 @@
 # Homelab
 
-> Ansible playbooks to manage my homelab.
+> Infrastructure as code for my homelab.
 
 **Clusters:**
 
