@@ -11,14 +11,14 @@ packages:
   - software-properties-common
   - lsb-release
 users:
-  - name: mrugesh
+  - name: ubuntu
     groups: sudo
     ansible.builtin.shell:  /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh_import_id:
       - raisedadead
 runcmd:
-  # This will install docker on the virtual machine and add the mrugesh user to docker usergroup
+  # This will install docker on the virtual machine and add the ubuntu user to docker usergroup
   - sudo mkdir -p /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor
     -o /etc/apt/keyrings/docker.gpg
@@ -31,5 +31,5 @@ runcmd:
     docker-compose-plugin
   - systemctl start docker
   - systemctl enable docker
-  - usermod -aG docker mrugesh
+  - usermod -aG docker ubuntu
 final_message: 'Setup complete'
