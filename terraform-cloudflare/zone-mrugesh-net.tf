@@ -61,6 +61,24 @@ resource "cloudflare_record" "mp-a-192-168-64-10" {
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
+resource "cloudflare_record" "traefik-mp-mrugesh-net" {
+  name    = "traefik-mp"
+  proxied = false
+  ttl     = 1
+  type    = "CNAME"
+  value   = "mp-ds-01-mrugesh.net"
+  zone_id = var.cloudflare_zone_id_mrugesh_net
+}
+
+resource "cloudflare_record" "swarmpit-mp-mrugesh-net" {
+  name    = "swarmpit-mp"
+  proxied = false
+  ttl     = 1
+  type    = "CNAME"
+  value   = "mp-ds-01-mrugesh.net"
+  zone_id = var.cloudflare_zone_id_mrugesh_net
+}
+
 resource "cloudflare_record" "www-cname-mrugesh-net" {
   name    = "www"
   proxied = true
