@@ -1,0 +1,23 @@
+---
+- name: Deploy Traefik
+  hosts: manager
+  gather_facts: false
+
+  tasks:
+    - name: Create network
+      ansible.builtin.command: docker network create --driver=overlay traefik-public
+      register: network_created
+      changed_when: network_created.rc == 0
+
+    - name: Get Swarm node ID
+      ansible.builtin.shell: |
+        set -e -o pipefail
+        docker info | grep NodeID | awk '{print $2}'
+      register: node_id
+      args:
+        executable: /bin/bash
+      changed_when: node_id.rc == 0
+
+    - name: Get Swarm node IP
+      ansible.builtin.debug:
+        msg: "Swarm node IP: {{ ansible_default_ipv4.address }}, ID: {{ node_id.stdout }}"
