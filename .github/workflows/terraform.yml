@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./terraform-cloudflare
+        working-directory: ./cloudflare
 
     env:
       EXPAND_SUMMARY_DETAILS: 'false'
