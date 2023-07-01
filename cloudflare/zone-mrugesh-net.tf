@@ -7,78 +7,6 @@ resource "cloudflare_record" "root-a" {
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
-resource "cloudflare_record" "pve-a-192-168-2-10" {
-  name    = "pve"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.2.10"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "hello-a-192-168-2-200" {
-  name    = "hello"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.2.200"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "mbp-a-192-168-2-100" {
-  name    = "mbp"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.2.100"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "mp-a-192-168-64-8" {
-  name    = "mp-ds-01"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.64.8"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "mp-a-192-168-64-9" {
-  name    = "mp-ds-02"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.64.9"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "mp-a-192-168-64-10" {
-  name    = "mp-ds-03"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "192.168.64.10"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "traefik-mp-mrugesh-net" {
-  name    = "traefik-mp"
-  proxied = false
-  ttl     = 1
-  type    = "CNAME"
-  value   = "mp-ds-01-mrugesh.net"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
-resource "cloudflare_record" "swarmpit-mp-mrugesh-net" {
-  name    = "swarmpit-mp"
-  proxied = false
-  ttl     = 1
-  type    = "CNAME"
-  value   = "mp-ds-01-mrugesh.net"
-  zone_id = var.cloudflare_zone_id_mrugesh_net
-}
-
 resource "cloudflare_record" "www-cname-mrugesh-net" {
   name    = "www"
   proxied = true
@@ -106,3 +34,4 @@ resource "cloudflare_record" "spf-txt" {
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
+# Add records below ----------------------------------------------
