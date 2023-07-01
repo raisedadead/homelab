@@ -35,3 +35,12 @@ resource "cloudflare_record" "spf-txt" {
 }
 
 # Add records below ----------------------------------------------
+
+resource "cloudflare_record" "pve" {
+  name    = "pve.mrugesh.net"
+  proxied = false
+  ttl     = 1
+  type    = "A"
+  value   = "192.168.2.10"
+  zone_id = var.cloudflare_zone_id_mrugesh_net
+}
