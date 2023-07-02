@@ -7,13 +7,13 @@
   tasks:
     - name: Restart the host
       ansible.builtin.reboot:
-        reboot_command: "shutdown -r now"
-        test_command: "uptime"
+        reboot_command: 'reboot'
+        test_command: 'uptime'
         connect_timeout: 5
         reboot_timeout: 300
         pre_reboot_delay: 10
         post_reboot_delay: 30
-        msg: "Reboot initiated by Ansible"
+        msg: 'Reboot initiated by Ansible'
       when: variable_shutdown is not defined
 
     - name: Shutdown the host

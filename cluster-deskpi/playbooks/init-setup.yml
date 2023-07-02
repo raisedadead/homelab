@@ -1,10 +1,10 @@
 ---
-- name: Initial Server Setup on a Ubuntu 20.04-based Raspberry Pi
+- name: Initial Server Setup on a Ubuntu Server-based Raspberry Pi
   hosts: "{{ variable_host | default('cluster') }}"
   become: true
   serial: 1
   vars:
-    created_username: pi
+    created_username: mrugesh
 
   tasks:
     - name: Install aptitude
@@ -27,6 +27,7 @@
         groups: sudo
         append: true
         create_home: true
+        shell: /bin/bash
 
     - name: Set authorized key for remote user
       ansible.posix.authorized_key:
