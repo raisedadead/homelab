@@ -37,10 +37,19 @@ resource "cloudflare_record" "spf-txt" {
 # Add records below ----------------------------------------------
 
 resource "cloudflare_record" "pve" {
-  name    = "pve.mrugesh.net"
+  name    = "pve.lan.mrugesh.net"
   proxied = false
   ttl     = 1
   type    = "A"
   value   = "192.168.2.10"
+  zone_id = var.cloudflare_zone_id_mrugesh_net
+}
+
+resource "cloudflare_record" "pihole" {
+  name    = "dns.lan.mrugesh.net"
+  proxied = false
+  ttl     = 1
+  type    = "A"
+  value   = "192.168.2.20"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
