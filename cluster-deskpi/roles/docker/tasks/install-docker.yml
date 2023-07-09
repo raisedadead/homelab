@@ -1,0 +1,56 @@
+---
+- name: Install pre-requisite dependencies
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg
+    - software-properties-common
+
+- name: Add gpg key for docker repository
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/keyrings/docker.gpg
+    state: present
+
+- name: Find the OS architecture
+  shell: dpkg --print-architecture
+  register: os_arch_result
+
+- name: Set the OS architecture
+  set_fact:
+    os_arch: "{{ os_arch_result.stdout }}"
+
+- name: Add repository
+  apt_repository:
+    repo: deb [arch={{ os_arch }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 60
+
+- name: Install docker and other packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - containerd.io
+    - docker-ce
+    - docker-ce-cli
+    - python3-docker # for ansible docker module used in other playbooks
+
+- name: Add user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    group: docker
+
+- name: start docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
