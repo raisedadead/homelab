@@ -14,8 +14,8 @@ After=network-online.target
 
 # Nomad server should be run as the nomad user. Nomad clients
 # should be run as root
-User={{ (inventory_hostname in groups['control_plane']) | ternary('nomad', 'root') }}
-Group={{ (inventory_hostname in groups['control_plane']) | ternary('nomad', 'root') }}
+User={{ (inventory_hostname in groups['leaders']) | ternary('nomad', 'root') }}
+Group={{ (inventory_hostname in groups['leaders']) | ternary('nomad', 'root') }}
 
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d

@@ -1,8 +1,0 @@
----
-- name: Initial Server Setup on a Ubuntu Server-based Raspberry Pi
-  hosts: "{{ variable_host | default('cluster') }}"
-  become: true
-  roles:
-    - basic
-    - docker
-    - nomad

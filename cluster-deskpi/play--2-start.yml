@@ -1,0 +1,35 @@
+---
+- name: Enable and Start Nomad Services
+  hosts: cluster
+  become: true
+  gather_facts: false
+  vars:
+    - restart_services: '{{ variable_restart_services | default(false) }}'
+  tasks:
+    - name: Open UFW ports for Nomad and Consul
+      ufw:
+        rule: allow
+        port: '{{ item }}'
+        proto: tcp
+        comment: '{{ item }}'
+      with_items:
+        - 4646
+        - 4647
+        - 4648
+        - 8300
+        - 8301
+        - 8302
+        - 8303
+        - 8304
+        - 8305
+        - 8500
+        - 8600
+        - 8601
+
+    - name: Enable and Start Nomad Services
+      service: name=nomad state=started enabled=yes
+      when: restart_services == false
+
+    - name: Restart Nomad Services
+      service: name=nomad state=restarted
+      when: restart_services == true
