@@ -1,0 +1,33 @@
+---
+- name: Restart or Shutdown
+  hosts: "{{ variable_host | default('null') }}"
+  serial: '{{ variable_serial | default(1) }}'
+  gather_facts: true
+  become: true
+  become_user: root
+  tasks:
+    - name: Check if /var/run/reboot-required exists
+      register: reboot_required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+        get_checksum: false
+
+    - name: Print uptime
+      debug:
+        msg:
+          'Host {{ inventory_hostname }} has been up for {{
+          ansible_facts.uptime_seconds/86400 }} days'
+
+    - name: Reboot the host
+      ansible.builtin.reboot:
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 15
+        post_reboot_delay: 15
+        test_command: uptime
+      when: variable_shutdown is not defined
+
+    - name: Shutdown the host
+      community.general.shutdown:
+        delay: 5
+      when: variable_shutdown | default(false)

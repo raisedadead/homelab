@@ -1,6 +1,6 @@
 ---
 - name: Check Uptime
-  hosts: "{{ variable_host | default('cluster') }}"
+  hosts: "{{ variable_host | default('none') }}"
   become: true
   become_method: sudo
 
