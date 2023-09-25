@@ -1,0 +1,17 @@
+---
+- name: Setup Docker
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+
+  vars:
+    pip_install_packages:
+      - name: docker
+
+  roles:
+    - geerlingguy.pip
+    - role: geerlingguy.docker
+      vars:
+        docker_edition: 'ce'
+        docker_install_compose: true
+        docker_users:
+          - '{{ ansible_user }}'
