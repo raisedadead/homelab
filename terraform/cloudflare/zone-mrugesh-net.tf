@@ -3,7 +3,7 @@ resource "cloudflare_record" "root-a" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "192.0.2.1"
+  content = "192.0.2.1"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
@@ -12,7 +12,7 @@ resource "cloudflare_record" "www-cname-mrugesh-net" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "mrugesh.net"
+  content = "mrugesh.net"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
@@ -21,7 +21,7 @@ resource "cloudflare_record" "dmarc-txt" {
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=DMARC1; p=reject; rua=mailto:noreply@mrugesh.net"
+  content = "v=DMARC1; p=reject; rua=mailto:noreply@mrugesh.net"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
@@ -30,7 +30,7 @@ resource "cloudflare_record" "spf-txt" {
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 -all"
+  content = "v=spf1 -all"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
 
@@ -41,6 +41,6 @@ resource "cloudflare_record" "kendra_on_2" {
   proxied = false
   ttl     = 1
   type    = "A"
-  value   = "192.168.0.25"
+  content = "192.168.0.25"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
