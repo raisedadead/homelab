@@ -36,11 +36,11 @@ resource "cloudflare_record" "spf-txt" {
 
 # Add records below ----------------------------------------------
 
-resource "cloudflare_record" "kendra_on_2" {
-  name    = "kendra.lan.mrugesh.net"
+resource "cloudflare_record" "home-A-record" {
+  name    = "home"
   proxied = false
   ttl     = 1
   type    = "A"
-  content = "192.168.0.25"
+  content = "192.168.1.200"
   zone_id = var.cloudflare_zone_id_mrugesh_net
 }
