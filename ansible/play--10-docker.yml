@@ -12,6 +12,8 @@
     - role: geerlingguy.docker
       vars:
         docker_edition: 'ce'
-        docker_install_compose: true
+        # Uses docker compose plugin (v2) by default via docker_install_compose_plugin: true
+        # Set to true only if you need legacy standalone docker-compose binary
+        docker_install_compose: false
         docker_users:
           - '{{ ansible_user }}'
