@@ -32,4 +32,4 @@
         msg:
           - "Portainer is running!"
           - "Access at: https://{{ inventory_hostname }}:9443"
-          - "Create your admin user on first login."
+          - "Uses self-signed certificate."

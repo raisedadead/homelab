@@ -1,0 +1,76 @@
+---
+- name: Setup Home Assistant
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+
+  vars:
+    homeassistant_version: "stable"
+    homeassistant_timezone: "Asia/Kolkata"
+    homeassistant_config_dir: "/home/{{ ansible_user }}/homeassistant"
+    homeassistant_deploy_dir: "/opt/homeassistant"
+
+  tasks:
+    - name: Create Home Assistant directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop:
+        - "{{ homeassistant_config_dir }}"
+        - "{{ homeassistant_config_dir }}/themes"
+        - "{{ homeassistant_deploy_dir }}"
+
+    - name: Copy docker-compose file
+      ansible.builtin.template:
+        src: templates/homeassistant/docker-compose.yml.j2
+        dest: "{{ homeassistant_deploy_dir }}/docker-compose.yml"
+        mode: "0644"
+
+    - name: Check if configuration.yaml exists
+      ansible.builtin.stat:
+        path: "{{ homeassistant_config_dir }}/configuration.yaml"
+      register: ha_config
+
+    - name: Deploy initial configuration.yaml
+      ansible.builtin.template:
+        src: templates/homeassistant/configuration.yaml.j2
+        dest: "{{ homeassistant_config_dir }}/configuration.yaml"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      when: not ha_config.stat.exists
+
+    - name: Create empty automation/script/scene files if missing
+      ansible.builtin.copy:
+        content: "[]"
+        dest: "{{ homeassistant_config_dir }}/{{ item }}"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        force: false
+      loop:
+        - automations.yaml
+        - scripts.yaml
+        - scenes.yaml
+
+    - name: Pull and start Home Assistant
+      ansible.builtin.command:
+        cmd: docker compose up -d --pull always
+        chdir: "{{ homeassistant_deploy_dir }}"
+      register: ha_start
+      changed_when: "'Started' in ha_start.stderr or 'Creating' in ha_start.stderr or 'Recreating' in ha_start.stderr"
+
+    - name: Wait for Home Assistant to start
+      ansible.builtin.wait_for:
+        port: 8123
+        delay: 5
+        timeout: 120
+
+    - name: Show Home Assistant access info
+      ansible.builtin.debug:
+        msg:
+          - "Home Assistant is running!"
+          - "Access at: http://{{ inventory_hostname }}:8123"
+          - "Config dir: {{ homeassistant_config_dir }}"
