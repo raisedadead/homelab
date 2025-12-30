@@ -2,7 +2,7 @@
 collections:
   # Used by play--00-power.yml (shutdown) and play--20-pve-subscription.yml (lineinfile)
   - name: community.general
-    version: "==12.1.0"
+    version: "==12.2.0"
 
   # Unused - no playbooks currently use docker modules from this collection
   # - name: community.docker
