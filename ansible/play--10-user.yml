@@ -1,0 +1,105 @@
+---
+- name: Setup User and SSH
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+  become_user: root
+
+  vars:
+    setup_user: "{{ variable_user | default('malati') }}"
+    setup_user_shell: "/bin/bash"
+    setup_user_groups:
+      - sudo
+    setup_github_users: "{{ variable_github_users | default(['raisedadead', 'prayashm']) }}"
+
+  tasks:
+    - name: Ensure user exists
+      ansible.builtin.user:
+        name: "{{ setup_user }}"
+        shell: "{{ setup_user_shell }}"
+        groups: "{{ setup_user_groups }}"
+        append: true
+        state: present
+
+    - name: Add user to docker group if it exists
+      ansible.builtin.user:
+        name: "{{ setup_user }}"
+        groups: docker
+        append: true
+      when: ansible_facts.getent_group is defined and 'docker' in ansible_facts.getent_group
+      ignore_errors: true
+
+    - name: Configure passwordless sudo
+      ansible.builtin.lineinfile:
+        path: "/etc/sudoers.d/{{ setup_user }}"
+        line: "{{ setup_user }} ALL=(ALL) NOPASSWD: ALL"
+        create: true
+        mode: "0440"
+        validate: "visudo -cf %s"
+
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "/home/{{ setup_user }}/.ssh"
+        state: directory
+        owner: "{{ setup_user }}"
+        group: "{{ setup_user }}"
+        mode: "0700"
+
+    - name: Import SSH keys from GitHub
+      ansible.builtin.shell:
+        cmd: "ssh-import-id gh:{{ item }}"
+      become_user: "{{ setup_user }}"
+      loop: "{{ setup_github_users }}"
+      register: ssh_import
+      changed_when: "'Adding' in ssh_import.stderr"
+
+    - name: Remove cloud-init sshd override
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+        state: absent
+
+    - name: Configure sshd - PermitRootLogin
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PermitRootLogin"
+        line: "PermitRootLogin no"
+        state: present
+
+    - name: Configure sshd - PasswordAuthentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PasswordAuthentication"
+        line: "PasswordAuthentication no"
+        state: present
+
+    - name: Configure sshd - PubkeyAuthentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PubkeyAuthentication"
+        line: "PubkeyAuthentication yes"
+        state: present
+
+    - name: Configure sshd - AllowUsers
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^AllowUsers"
+        line: "AllowUsers {{ setup_user }}"
+        state: present
+
+    - name: Configure sshd - Disable locale forwarding
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^AcceptEnv"
+        line: "AcceptEnv LANG"
+        state: present
+
+    - name: Restart sshd
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted
+
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg:
+          - "User setup complete for {{ setup_user }}"
+          - "SSH keys imported from: {{ setup_github_users | join(', ') }}"
+          - "Password authentication is now DISABLED"

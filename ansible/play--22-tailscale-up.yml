@@ -1,0 +1,75 @@
+---
+- name: Connect to Tailscale Network
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+  gather_facts: false
+
+  vars:
+    tailscale_tags: "{{ variable_tailscale_tags | default('tag:services') }}"
+    tailscale_exit_node: "{{ variable_tailscale_exit_node | default(false) }}"
+    tailscale_cert: "{{ variable_tailscale_cert | default(false) }}"
+
+  tasks:
+    - name: Check Tailscale is installed
+      ansible.builtin.command:
+        cmd: tailscale --version
+      register: tailscale_version
+      changed_when: false
+
+    - name: Build tailscale up command
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: >-
+          tailscale up
+          --authkey "{{ lookup('env', 'TAILSCALE_AUTH_KEY') }}"
+          --hostname {{ inventory_hostname }}
+          --advertise-tags={{ tailscale_tags }}
+          --ssh
+          {{ '--advertise-exit-node' if tailscale_exit_node | bool else '' }}
+          --force-reauth
+          --reset
+
+    - name: Connect to Tailscale
+      ansible.builtin.shell:
+        cmd: "{{ tailscale_up_cmd }}"
+        executable: /bin/bash
+      no_log: true
+      changed_when: true
+      ignore_errors: true
+      register: tailscale_up
+
+    - name: Print error if failed
+      ansible.builtin.debug:
+        msg: "{{ tailscale_up.stderr }}"
+      when: tailscale_up.rc != 0
+
+    - name: Check connection status
+      ansible.builtin.shell:
+        cmd: tailscale status --json | jq -r '.Self.Online'
+        executable: /bin/bash
+      register: tailscale_status
+      changed_when: false
+
+    - name: Get DNS name
+      ansible.builtin.shell:
+        cmd: tailscale status --json | jq -r '.Self.DNSName'
+        executable: /bin/bash
+      register: tailscale_dns
+      changed_when: false
+
+    - name: Generate TLS certificate
+      ansible.builtin.shell:
+        cmd: tailscale cert {{ tailscale_dns.stdout | regex_replace('\\.+$', '') }}
+        executable: /bin/bash
+      changed_when: true
+      ignore_errors: true
+      register: tailscale_cert_result
+      when: tailscale_cert | bool
+
+    - name: Display status
+      ansible.builtin.debug:
+        msg:
+          - "Online: {{ tailscale_status.stdout }}"
+          - "DNS: {{ tailscale_dns.stdout }}"
+          - "SSH: enabled"
+          - "Exit node: {{ tailscale_exit_node }}"
+          - "Cert generated: {{ tailscale_cert }}"

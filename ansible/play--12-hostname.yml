@@ -1,0 +1,38 @@
+---
+- name: Setup Hostname
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+  become_user: root
+
+  vars:
+    hostname_domain: "{{ variable_domain | default('lan.mrugesh.net') }}"
+
+  tasks:
+    - name: Get current hostname
+      ansible.builtin.command:
+        cmd: hostname -s
+      register: current_hostname
+      changed_when: false
+
+    - name: Set FQDN hostname
+      ansible.builtin.hostname:
+        name: "{{ current_hostname.stdout }}.{{ hostname_domain }}"
+
+    - name: Preserve hostname in cloud-init
+      ansible.builtin.lineinfile:
+        path: /etc/cloud/cloud.cfg
+        regexp: "^preserve_hostname:"
+        line: "preserve_hostname: true"
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+      ignore_errors: true
+
+    - name: Verify hostname
+      ansible.builtin.command:
+        cmd: hostname
+      register: hostname_check
+      changed_when: false
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "Hostname set to: {{ hostname_check.stdout }}"
