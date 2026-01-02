@@ -1,0 +1,10 @@
+# Managed by Ansible - Do not edit manually
+use_x_forwarded_for: true
+trusted_proxies:
+  - 127.0.0.1
+  - ::1
+  - 100.64.0.0/10   # Tailscale CGNAT range
+  - 192.168.0.0/16  # Private network range
+  - 172.16.0.0/12   # Docker networks (cloudflared)
+ip_ban_enabled: true
+login_attempts_threshold: 5

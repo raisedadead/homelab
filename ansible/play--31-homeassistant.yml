@@ -27,6 +27,7 @@
         src: templates/homeassistant/docker-compose.yml.j2
         dest: "{{ homeassistant_deploy_dir }}/docker-compose.yml"
         mode: "0644"
+      register: ha_compose
 
     - name: Check if configuration.yaml exists
       ansible.builtin.stat:
@@ -55,9 +56,81 @@
         - scripts.yaml
         - scenes.yaml
 
+    - name: Deploy managed config files (idempotent)
+      ansible.builtin.template:
+        src: "templates/homeassistant/{{ item }}.j2"
+        dest: "{{ homeassistant_config_dir }}/{{ item }}"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop:
+        - http.yaml
+      register: ha_managed_configs
+
+    # HACS Installation
+    - name: Create custom_components/hacs directory
+      ansible.builtin.file:
+        path: "{{ homeassistant_config_dir }}/custom_components/hacs"
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Check if HACS is installed
+      ansible.builtin.stat:
+        path: "{{ homeassistant_config_dir }}/custom_components/hacs/manifest.json"
+      register: hacs_installed
+
+    - name: Download HACS
+      ansible.builtin.get_url:
+        url: "https://github.com/hacs/integration/releases/latest/download/hacs.zip"
+        dest: "/tmp/hacs.zip"
+        mode: "0644"
+      when: not hacs_installed.stat.exists
+
+    - name: Extract HACS to hacs directory
+      ansible.builtin.unarchive:
+        src: "/tmp/hacs.zip"
+        dest: "{{ homeassistant_config_dir }}/custom_components/hacs"
+        remote_src: true
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      when: not hacs_installed.stat.exists
+      register: hacs_extracted
+
+    - name: Clean up HACS zip
+      ansible.builtin.file:
+        path: "/tmp/hacs.zip"
+        state: absent
+      when: not hacs_installed.stat.exists
+
+    - name: Check for legacy inline http config
+      ansible.builtin.shell: |
+        grep -A1 '^http:' {{ homeassistant_config_dir }}/configuration.yaml | grep -q 'use_x_forwarded_for\|trusted_proxies'
+      register: ha_legacy_http
+      changed_when: false
+      failed_when: false
+
+    - name: Remove legacy inline http config and set include
+      ansible.builtin.replace:
+        path: "{{ homeassistant_config_dir }}/configuration.yaml"
+        regexp: '^http:.*?(?=\n\S|\n#|\Z)'
+        replace: 'http: !include http.yaml'
+      when: ha_legacy_http.rc == 0
+      register: ha_http_migrated
+
+    - name: Ensure http include exists in configuration.yaml
+      ansible.builtin.lineinfile:
+        path: "{{ homeassistant_config_dir }}/configuration.yaml"
+        regexp: '^http:'
+        line: 'http: !include http.yaml'
+        state: present
+      when: ha_legacy_http.rc != 0
+      register: ha_http_include
+
     - name: Pull and start Home Assistant
       ansible.builtin.command:
-        cmd: docker compose up -d --pull always
+        cmd: "docker compose up -d --pull always {{ '--force-recreate' if ha_compose.changed else '' }}"
         chdir: "{{ homeassistant_deploy_dir }}"
       register: ha_start
       changed_when: "'Started' in ha_start.stderr or 'Creating' in ha_start.stderr or 'Recreating' in ha_start.stderr"
@@ -67,6 +140,26 @@
         port: 8123
         delay: 5
         timeout: 120
+
+    - name: Restart Home Assistant if managed configs changed
+      ansible.builtin.command:
+        cmd: docker restart homeassistant
+      when: >
+        ha_managed_configs.changed or
+        (ha_http_include.changed | default(false)) or
+        (ha_http_migrated.changed | default(false)) or
+        (hacs_extracted.changed | default(false))
+
+    - name: Wait for Home Assistant to restart
+      ansible.builtin.wait_for:
+        port: 8123
+        delay: 5
+        timeout: 120
+      when: >
+        ha_managed_configs.changed or
+        (ha_http_include.changed | default(false)) or
+        (ha_http_migrated.changed | default(false)) or
+        (hacs_extracted.changed | default(false))
 
     - name: Show Home Assistant access info
       ansible.builtin.debug:

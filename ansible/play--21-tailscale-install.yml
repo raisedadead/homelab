@@ -44,6 +44,20 @@
         state: latest
         update_cache: true
 
+    - name: Enable IP forwarding for subnet routing and exit node
+      ansible.builtin.copy:
+        content: |
+          net.ipv4.ip_forward = 1
+          net.ipv6.conf.all.forwarding = 1
+        dest: /etc/sysctl.d/99-tailscale.conf
+        mode: "0644"
+      register: sysctl_config
+
+    - name: Apply sysctl settings
+      ansible.builtin.command:
+        cmd: sysctl -p /etc/sysctl.d/99-tailscale.conf
+      when: sysctl_config.changed
+
     - name: Verify installation
       ansible.builtin.command:
         cmd: tailscale --version

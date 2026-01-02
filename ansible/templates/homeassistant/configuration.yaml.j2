@@ -1,13 +1,9 @@
-# Managed by Ansible
+# Managed by Ansible (initial deployment only)
 # Loads default set of integrations. Do not remove.
 default_config:
 
-# HTTP configuration for reverse proxy support
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-    - ::1
+# HTTP configuration - managed by Ansible via http.yaml
+http: !include http.yaml
 
 # Load frontend themes from the themes folder
 frontend:

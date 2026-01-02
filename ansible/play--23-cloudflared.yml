@@ -1,0 +1,51 @@
+---
+- name: Install and Configure Cloudflared (Docker)
+  hosts: "{{ variable_host | default('none') }}"
+  become: true
+  gather_facts: true
+
+  vars:
+    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
+    cloudflared_deploy_dir: "/opt/cloudflared"
+
+  tasks:
+    - name: Validate tunnel token is provided
+      ansible.builtin.fail:
+        msg: "CLOUDFLARED_TOKEN environment variable is required but not set"
+      when: cloudflared_token | length == 0
+
+    - name: Create cloudflared directory
+      ansible.builtin.file:
+        path: "{{ cloudflared_deploy_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Deploy docker-compose file
+      ansible.builtin.template:
+        src: templates/cloudflared/docker-compose.yml.j2
+        dest: "{{ cloudflared_deploy_dir }}/docker-compose.yml"
+        mode: "0644"
+      register: cloudflared_compose
+
+    - name: Pull and start cloudflared
+      ansible.builtin.command:
+        cmd: "docker compose up -d --pull always {{ '--force-recreate' if cloudflared_compose.changed else '' }}"
+        chdir: "{{ cloudflared_deploy_dir }}"
+      register: cloudflared_start
+      changed_when: "'Started' in cloudflared_start.stderr or 'Creating' in cloudflared_start.stderr or 'Recreating' in cloudflared_start.stderr"
+
+    - name: Wait for cloudflared to initialize
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Check cloudflared container status
+      ansible.builtin.command:
+        cmd: docker ps --filter name=cloudflared --format "{{ '{{' }}.Status{{ '}}' }}"
+      register: cloudflared_status
+      changed_when: false
+
+    - name: Display status
+      ansible.builtin.debug:
+        msg:
+          - "Cloudflared container status: {{ cloudflared_status.stdout }}"
+          - "Tunnel connected to Cloudflare Zero Trust"
