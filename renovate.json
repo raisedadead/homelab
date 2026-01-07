@@ -1,9 +1,13 @@
 {
-  "extends": ["github>raisedadead/renovate-config:default"],
+  "extends": [
+    "github>raisedadead/renovate-config:default"
+  ],
   "packageRules": [
     {
-      "matchPackagePatterns": ["^boto"],
-      "groupName": "boto packages"
+      "groupName": "boto packages",
+      "matchPackageNames": [
+        "/^boto/"
+      ]
     }
   ]
 }
