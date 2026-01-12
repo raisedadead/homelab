@@ -1,0 +1,15 @@
+---
+# Home Assistant directory setup
+
+- name: Create Home Assistant directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - "{{ homeassistant_config_dir }}"
+    - "{{ homeassistant_config_dir }}/themes"
+    - "{{ homeassistant_config_dir }}/custom_components"
+    - "{{ homeassistant_deploy_dir }}"

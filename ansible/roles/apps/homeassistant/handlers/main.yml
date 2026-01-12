@@ -1,0 +1,16 @@
+---
+# Home Assistant handlers
+
+- name: Restart Home Assistant
+  community.docker.docker_container:
+    name: "{{ homeassistant_container_name }}"
+    state: started
+    restart: true
+  listen: Restart Home Assistant
+
+- name: Wait for Home Assistant after restart
+  ansible.builtin.wait_for:
+    port: "{{ homeassistant_port }}"
+    delay: 5
+    timeout: 120
+  listen: Restart Home Assistant

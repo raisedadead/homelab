@@ -1,0 +1,13 @@
+---
+# malati-pi host-specific variables
+
+# Network
+ansible_host: malati-pi  # Tailscale MagicDNS
+# ansible_host: malati-pi.local  # Local mDNS (when on-site)
+
+# Tailscale
+tailscale_hostname: malati-pi
+tailscale_tags: "tag:services"
+tailscale_ssh: true
+tailscale_exit_node: false
+tailscale_cert: false

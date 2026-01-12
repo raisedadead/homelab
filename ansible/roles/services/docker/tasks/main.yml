@@ -1,0 +1,18 @@
+---
+# Docker installation tasks
+# This role wraps geerlingguy.docker and geerlingguy.pip
+
+- name: Include geerlingguy.pip role
+  ansible.builtin.include_role:
+    name: geerlingguy.pip
+  vars:
+    pip_install_packages: "{{ pip_install_packages }}"
+
+- name: Include geerlingguy.docker role
+  ansible.builtin.include_role:
+    name: geerlingguy.docker
+  vars:
+    docker_edition: "{{ docker_edition }}"
+    docker_install_compose_plugin: "{{ docker_install_compose_plugin }}"
+    docker_install_compose: "{{ docker_install_compose }}"
+    docker_users: "{{ docker_users }}"

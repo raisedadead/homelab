@@ -1,0 +1,54 @@
+---
+# Home Assistant configuration files
+
+- name: Check if configuration.yaml exists
+  ansible.builtin.stat:
+    path: "{{ homeassistant_config_dir }}/configuration.yaml"
+  register: ha_config
+
+- name: Deploy initial configuration.yaml
+  ansible.builtin.template:
+    src: configuration.yaml.j2
+    dest: "{{ homeassistant_config_dir }}/configuration.yaml"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  when: not ha_config.stat.exists
+
+- name: Create empty automation/script/scene files if missing
+  ansible.builtin.copy:
+    content: "[]"
+    dest: "{{ homeassistant_config_dir }}/{{ item }}"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    force: false
+  loop:
+    - automations.yaml
+    - scripts.yaml
+    - scenes.yaml
+
+- name: Deploy managed http.yaml config
+  ansible.builtin.template:
+    src: http.yaml.j2
+    dest: "{{ homeassistant_config_dir }}/http.yaml"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  register: ha_http_config
+  notify: Restart Home Assistant
+
+- name: Ensure http include exists in configuration.yaml
+  ansible.builtin.lineinfile:
+    path: "{{ homeassistant_config_dir }}/configuration.yaml"
+    regexp: "^http:"
+    line: "http: !include http.yaml"
+    state: present
+  notify: Restart Home Assistant
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ homeassistant_deploy_dir }}/docker-compose.yml"
+    mode: "0644"
+  register: ha_compose

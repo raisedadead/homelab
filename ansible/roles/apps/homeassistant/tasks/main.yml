@@ -1,0 +1,15 @@
+---
+# Home Assistant deployment tasks
+
+- name: Setup directories
+  ansible.builtin.include_tasks: directories.yml
+
+- name: Setup configuration files
+  ansible.builtin.include_tasks: config.yml
+
+- name: Install HACS
+  ansible.builtin.include_tasks: hacs.yml
+  when: homeassistant_install_hacs
+
+- name: Deploy container
+  ansible.builtin.include_tasks: deploy.yml

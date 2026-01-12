@@ -1,0 +1,7 @@
+---
+# Cloudflared role defaults
+
+cloudflared_token: "{{ vault_cloudflared_token | default('') }}"
+cloudflared_deploy_dir: /opt/cloudflared
+cloudflared_image: cloudflare/cloudflared:latest
+cloudflared_container_name: cloudflared

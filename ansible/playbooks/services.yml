@@ -1,0 +1,33 @@
+---
+# Services playbook - Infrastructure services deployment
+# Usage: ansible-playbook playbooks/services.yml -i inventories/<site>/hosts.yml --ask-vault-pass
+#
+# Tags:
+#   - docker: Docker CE installation
+#   - tailscale: Tailscale VPN
+#   - cloudflared: Cloudflare tunnel
+
+- name: Deploy infrastructure services
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: services/docker
+      tags: [services, docker]
+
+    - role: services/tailscale
+      tags: [services, tailscale]
+
+    - role: services/cloudflared
+      tags: [services, cloudflared]
+      when: vault_cloudflared_token is defined and vault_cloudflared_token | length > 0
+
+  post_tasks:
+    - name: Display services status
+      ansible.builtin.debug:
+        msg:
+          - "Services deployed on {{ inventory_hostname }}"
+          - "Docker: installed"
+          - "Tailscale: connected"
+      tags: always

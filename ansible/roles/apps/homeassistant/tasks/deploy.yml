@@ -1,0 +1,26 @@
+---
+# Home Assistant container deployment
+
+- name: Deploy Home Assistant container
+  community.docker.docker_compose_v2:
+    project_src: "{{ homeassistant_deploy_dir }}"
+    state: present
+    pull: always
+    recreate: "{{ 'always' if ha_compose.changed else 'never' }}"
+  register: ha_deploy
+
+- name: Wait for Home Assistant to start
+  ansible.builtin.wait_for:
+    port: "{{ homeassistant_port }}"
+    delay: 5
+    timeout: 120
+
+- name: Flush handlers (restart if needed)
+  ansible.builtin.meta: flush_handlers
+
+- name: Display Home Assistant access info
+  ansible.builtin.debug:
+    msg:
+      - "Home Assistant is running!"
+      - "Access at: http://{{ inventory_hostname }}:{{ homeassistant_port }}"
+      - "Config dir: {{ homeassistant_config_dir }}"

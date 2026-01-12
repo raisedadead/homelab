@@ -1,0 +1,22 @@
+---
+# Malati site defaults
+
+# Inherit global defaults, override as needed
+ansible_user: "{{ default_user }}"
+
+# Site-specific settings
+site_name: malati
+site_timezone: "{{ default_timezone }}"
+site_domain: "{{ default_domain }}"
+
+# Home Assistant specific
+homeassistant_config_dir: "/home/{{ ansible_user }}/homeassistant"
+homeassistant_deploy_dir: /opt/homeassistant
+homeassistant_version: stable
+
+# Portainer
+portainer_version: lts
+portainer_deploy_dir: /opt/portainer
+
+# Cloudflared
+cloudflared_deploy_dir: /opt/cloudflared

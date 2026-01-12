@@ -1,0 +1,43 @@
+---
+# User setup tasks
+
+- name: Ensure user exists
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    shell: "{{ user_shell }}"
+    groups: "{{ user_groups }}"
+    append: true
+    state: present
+
+- name: Add user to docker group if it exists
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: docker
+    append: true
+  failed_when: false
+  changed_when: false
+  when: "'docker' in ansible_facts.packages | default({})"
+
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ user_name }} ALL=(ALL) NOPASSWD: ALL\n"
+    dest: "/etc/sudoers.d/{{ user_name }}"
+    mode: "0440"
+    validate: "visudo -cf %s"
+  when: user_passwordless_sudo
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "/home/{{ user_name }}/.ssh"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: "0700"
+
+- name: Add SSH keys from GitHub
+  ansible.posix.authorized_key:
+    user: "{{ user_name }}"
+    key: "https://github.com/{{ item }}.keys"
+    state: present
+  loop: "{{ user_github_keys }}"
+  when: user_github_keys | length > 0

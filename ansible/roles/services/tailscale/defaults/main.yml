@@ -1,0 +1,15 @@
+---
+# Tailscale role defaults
+
+# Auth key from vault
+tailscale_auth_key: "{{ vault_tailscale_auth_key | default('') }}"
+
+# Connection settings
+tailscale_hostname: "{{ inventory_hostname }}"
+tailscale_tags: "{{ default_tailscale_tags | default('tag:services') }}"
+tailscale_ssh: "{{ default_tailscale_ssh | default(true) }}"
+tailscale_exit_node: "{{ default_tailscale_exit_node | default(false) }}"
+tailscale_cert: false
+
+# Package management
+tailscale_package_state: present  # present, latest

@@ -1,0 +1,38 @@
+---
+# HACS installation
+
+- name: Create HACS directory
+  ansible.builtin.file:
+    path: "{{ homeassistant_config_dir }}/custom_components/hacs"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Check if HACS is installed
+  ansible.builtin.stat:
+    path: "{{ homeassistant_config_dir }}/custom_components/hacs/manifest.json"
+  register: hacs_installed
+
+- name: Download HACS
+  ansible.builtin.get_url:
+    url: "https://github.com/hacs/integration/releases/latest/download/hacs.zip"
+    dest: "/tmp/hacs.zip"
+    mode: "0644"
+  when: not hacs_installed.stat.exists
+
+- name: Extract HACS
+  ansible.builtin.unarchive:
+    src: "/tmp/hacs.zip"
+    dest: "{{ homeassistant_config_dir }}/custom_components/hacs"
+    remote_src: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  when: not hacs_installed.stat.exists
+  notify: Restart Home Assistant
+
+- name: Clean up HACS zip
+  ansible.builtin.file:
+    path: "/tmp/hacs.zip"
+    state: absent
+  when: not hacs_installed.stat.exists

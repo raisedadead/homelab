@@ -1,0 +1,14 @@
+---
+services:
+  homeassistant:
+    container_name: {{ homeassistant_container_name }}
+    image: ghcr.io/home-assistant/home-assistant:{{ homeassistant_version }}
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    environment:
+      - TZ={{ homeassistant_timezone }}
+    volumes:
+      - {{ homeassistant_config_dir }}:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro

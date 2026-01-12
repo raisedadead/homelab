@@ -1,0 +1,38 @@
+---
+# Update playbook - System package updates
+# Usage: ansible-playbook playbooks/maintenance/update.yml -i inventories/<site>/hosts.yml
+
+- name: Update system packages
+  hosts: all
+  become: true
+  gather_facts: false
+  serial: "{{ update_serial | default(1) }}"
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 0
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Autoclean old packages
+      ansible.builtin.apt:
+        autoclean: true
+
+    - name: Autoremove unused packages
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Display update status
+      ansible.builtin.debug:
+        msg:
+          - "Update complete for {{ inventory_hostname }}"
+          - "Reboot required: {{ reboot_required.stat.exists }}"

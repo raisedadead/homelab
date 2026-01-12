@@ -1,0 +1,10 @@
+---
+# Arpigesh site defaults
+
+# Inherit global defaults, override as needed
+ansible_user: "{{ default_user }}"
+
+# Site-specific settings
+site_name: arpigesh
+site_timezone: "{{ default_timezone }}"
+site_domain: "{{ default_domain }}"

@@ -30,6 +30,7 @@ ansible/.ansible/
 ansible/.venv/
 ansible/uv.lock
 ansible/*.retry
+ansible/.vault_pass
 
 # Python
 __pycache__/

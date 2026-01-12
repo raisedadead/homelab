@@ -1,0 +1,12 @@
+---
+# Home Assistant role defaults
+
+homeassistant_version: stable
+homeassistant_timezone: "{{ site_timezone | default(default_timezone) | default('UTC') }}"
+homeassistant_config_dir: "/home/{{ ansible_user }}/homeassistant"
+homeassistant_deploy_dir: /opt/homeassistant
+homeassistant_container_name: homeassistant
+homeassistant_port: 8123
+
+# HACS installation
+homeassistant_install_hacs: true

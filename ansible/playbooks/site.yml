@@ -1,0 +1,58 @@
+---
+# Site playbook - Full deployment (bootstrap + services + apps)
+# Usage: ansible-playbook playbooks/site.yml -i inventories/<site>/hosts.yml --ask-vault-pass
+#
+# This playbook runs all roles in order for a complete site deployment.
+
+- name: Full site deployment
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display deployment start
+      ansible.builtin.debug:
+        msg: "Starting full deployment for {{ inventory_hostname }}"
+      tags: always
+
+  roles:
+    # Base system setup
+    - role: base/user
+      tags: [bootstrap, user]
+
+    - role: base/ssh
+      tags: [bootstrap, ssh]
+
+    - role: base/locale
+      tags: [bootstrap, locale]
+
+    - role: base/hostname
+      tags: [bootstrap, hostname]
+
+    # Infrastructure services
+    - role: services/docker
+      tags: [services, docker]
+
+    - role: services/tailscale
+      tags: [services, tailscale]
+
+    - role: services/cloudflared
+      tags: [services, cloudflared]
+      when: vault_cloudflared_token is defined and vault_cloudflared_token | length > 0
+
+    # Applications (conditional based on group membership)
+    - role: apps/portainer
+      tags: [apps, portainer]
+      when: "'homeassistant_stack' in group_names"
+
+    - role: apps/homeassistant
+      tags: [apps, homeassistant]
+      when: "'homeassistant_stack' in group_names"
+
+  post_tasks:
+    - name: Display deployment completion
+      ansible.builtin.debug:
+        msg:
+          - "Full deployment complete for {{ inventory_hostname }}"
+          - "Site: {{ site_name | default('unknown') }}"
+      tags: always

@@ -1,0 +1,71 @@
+---
+# Tailscale configuration tasks (idempotent)
+
+- name: Validate auth key is provided
+  ansible.builtin.fail:
+    msg: "tailscale_auth_key is required. Set vault_tailscale_auth_key in your vault file."
+  when: tailscale_auth_key | length == 0
+
+- name: Check Tailscale backend state
+  ansible.builtin.command:
+    cmd: tailscale status --json
+  register: tailscale_status_raw
+  changed_when: false
+  failed_when: false
+
+- name: Parse Tailscale status
+  ansible.builtin.set_fact:
+    tailscale_backend_state: "{{ (tailscale_status_raw.stdout | from_json).BackendState | default('Unknown') }}"
+    tailscale_current_hostname: "{{ (tailscale_status_raw.stdout | from_json).Self.HostName | default('') }}"
+  when: tailscale_status_raw.rc == 0
+
+- name: Determine if Tailscale needs configuration
+  ansible.builtin.set_fact:
+    tailscale_needs_auth: >-
+      {{
+        tailscale_status_raw.rc != 0 or
+        tailscale_backend_state != 'Running' or
+        tailscale_current_hostname != tailscale_hostname
+      }}
+
+- name: Build tailscale up command
+  ansible.builtin.set_fact:
+    tailscale_up_cmd: >-
+      tailscale up
+      --authkey {{ tailscale_auth_key }}
+      --hostname {{ tailscale_hostname }}
+      --advertise-tags={{ tailscale_tags }}
+      {{ '--ssh' if tailscale_ssh else '' }}
+      {{ '--advertise-exit-node' if tailscale_exit_node else '' }}
+  when: tailscale_needs_auth
+  no_log: true
+
+- name: Connect to Tailscale
+  ansible.builtin.command:
+    cmd: "{{ tailscale_up_cmd }}"
+  when: tailscale_needs_auth
+  no_log: true
+  register: tailscale_up_result
+  changed_when: tailscale_up_result.rc == 0
+
+- name: Generate TLS certificate
+  ansible.builtin.command:
+    cmd: "tailscale cert {{ tailscale_hostname }}"
+  when: tailscale_cert
+  register: tailscale_cert_result
+  changed_when: "'wrote' in tailscale_cert_result.stdout | default('')"
+  failed_when: false
+
+- name: Get final Tailscale status
+  ansible.builtin.command:
+    cmd: tailscale status --json
+  register: tailscale_final_status
+  changed_when: false
+
+- name: Display Tailscale status
+  ansible.builtin.debug:
+    msg:
+      - "Backend: {{ (tailscale_final_status.stdout | from_json).BackendState }}"
+      - "Hostname: {{ (tailscale_final_status.stdout | from_json).Self.HostName }}"
+      - "DNS: {{ (tailscale_final_status.stdout | from_json).Self.DNSName }}"
+      - "SSH: {{ tailscale_ssh }}"

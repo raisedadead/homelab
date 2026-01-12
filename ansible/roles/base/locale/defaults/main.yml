@@ -1,0 +1,6 @@
+---
+# Locale role defaults
+
+locale_lang: "{{ default_locale_lang | default('en_US.UTF-8') }}"
+locale_all: "{{ default_locale_all | default('en_US.UTF-8') }}"
+locale_generate: "{{ default_locale_generate | default(['en_US.UTF-8 UTF-8']) }}"

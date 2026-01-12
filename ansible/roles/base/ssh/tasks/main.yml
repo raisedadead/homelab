@@ -1,0 +1,48 @@
+---
+# SSH hardening tasks
+
+- name: Remove cloud-init sshd override
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+    state: absent
+  notify: Restart sshd
+
+- name: Configure sshd - PermitRootLogin
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin {{ ssh_permit_root_login }}"
+    state: present
+  notify: Restart sshd
+
+- name: Configure sshd - PasswordAuthentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication {{ ssh_password_authentication }}"
+    state: present
+  notify: Restart sshd
+
+- name: Configure sshd - PubkeyAuthentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PubkeyAuthentication"
+    line: "PubkeyAuthentication {{ ssh_pubkey_authentication }}"
+    state: present
+  notify: Restart sshd
+
+- name: Configure sshd - AllowUsers
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^AllowUsers"
+    line: "AllowUsers {{ ssh_allow_users }}"
+    state: present
+  notify: Restart sshd
+
+- name: Configure sshd - AcceptEnv (disable locale forwarding issues)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^AcceptEnv"
+    line: "AcceptEnv {{ ssh_accept_env }}"
+    state: present
+  notify: Restart sshd

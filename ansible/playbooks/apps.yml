@@ -1,0 +1,33 @@
+---
+# Apps playbook - Container application deployment
+# Usage: ansible-playbook playbooks/apps.yml -i inventories/<site>/hosts.yml
+#
+# Tags:
+#   - portainer: Portainer CE
+#   - homeassistant: Home Assistant
+#   - homebridge: Homebridge (HomeKit bridge)
+
+- name: Deploy container applications
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: apps/portainer
+      tags: [apps, portainer]
+      when: "'homeassistant_stack' in group_names or 'portainer' in (deploy_apps | default([]))"
+
+    - role: apps/homeassistant
+      tags: [apps, homeassistant]
+      when: "'homeassistant_stack' in group_names or 'homeassistant' in (deploy_apps | default([]))"
+
+    - role: apps/homebridge
+      tags: [apps, homebridge]
+      when: "'homebridge_stack' in group_names or 'homebridge' in (deploy_apps | default([]))"
+
+  post_tasks:
+    - name: Display apps status
+      ansible.builtin.debug:
+        msg:
+          - "Applications deployed on {{ inventory_hostname }}"
+      tags: always
