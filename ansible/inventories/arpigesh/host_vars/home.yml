@@ -1,0 +1,17 @@
+---
+# home (Homebridge CM4) host-specific variables
+
+# Network
+ansible_host: home  # Tailscale MagicDNS
+ansible_user: mrugesh  # Different from default 'malati'
+
+# Tailscale
+tailscale_hostname: home
+tailscale_tags: "tag:services"
+tailscale_ssh: true
+tailscale_exit_node: false
+
+# Homebridge - matches existing deployment
+homebridge_deploy_dir: /home/mrugesh/homebridge
+homebridge_config_dir: /home/mrugesh/homebridge/homebridge
+homebridge_timezone: Asia/Kolkata

@@ -1,0 +1,13 @@
+---
+# Homebridge role defaults
+
+homebridge_deploy_dir: "/home/{{ ansible_user }}/homebridge"
+homebridge_config_dir: "{{ homebridge_deploy_dir }}/homebridge"
+homebridge_container_name: homebridge
+homebridge_image: homebridge/homebridge:latest
+homebridge_timezone: "{{ site_timezone | default(default_timezone) | default('UTC') }}"
+homebridge_port: 8581
+
+# Logging
+homebridge_log_max_size: "10mb"
+homebridge_log_max_file: "1"

@@ -1,0 +1,37 @@
+---
+# Bootstrap playbook - Initial host setup
+# Usage: ansible-playbook playbooks/bootstrap.yml -i inventories/<site>/hosts.yml -l <host>
+#
+# Tags:
+#   - user: User account and SSH keys
+#   - ssh: SSH hardening
+#   - locale: Locale configuration
+#   - hostname: FQDN hostname setup
+
+- name: Bootstrap new host
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: base/user
+      tags: [bootstrap, user]
+
+    - role: base/ssh
+      tags: [bootstrap, ssh]
+
+    - role: base/locale
+      tags: [bootstrap, locale]
+
+    - role: base/hostname
+      tags: [bootstrap, hostname]
+
+  post_tasks:
+    - name: Display bootstrap completion
+      ansible.builtin.debug:
+        msg:
+          - "Bootstrap complete for {{ inventory_hostname }}"
+          - "User: {{ user_name }}"
+          - "SSH: Password auth disabled, keys configured"
+          - "Locale: {{ locale_lang }}"
+      tags: always

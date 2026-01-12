@@ -1,0 +1,7 @@
+---
+# Portainer role defaults
+
+portainer_version: lts
+portainer_deploy_dir: /opt/portainer
+portainer_container_name: portainer
+portainer_port: 9443

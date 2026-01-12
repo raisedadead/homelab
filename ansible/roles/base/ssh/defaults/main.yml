@@ -1,0 +1,8 @@
+---
+# SSH hardening defaults
+
+ssh_permit_root_login: "no"
+ssh_password_authentication: "no"
+ssh_pubkey_authentication: "yes"
+ssh_allow_users: "{{ user_name | default(default_user) }}"
+ssh_accept_env: "LANG"

@@ -1,0 +1,23 @@
+---
+# Hostname setup tasks
+
+- name: Get current short hostname
+  ansible.builtin.command:
+    cmd: hostname -s
+  register: current_hostname
+  changed_when: false
+
+- name: Set FQDN hostname
+  ansible.builtin.hostname:
+    name: "{{ current_hostname.stdout }}.{{ hostname_domain }}"
+
+- name: Preserve hostname in cloud-init
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: "^preserve_hostname:"
+    line: "preserve_hostname: true"
+    state: present
+  when:
+    - hostname_preserve_in_cloud_init
+    - ansible_facts['os_family'] == 'Debian'
+  failed_when: false

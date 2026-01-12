@@ -1,0 +1,51 @@
+---
+# Check playbook - System status check
+# Usage: ansible-playbook playbooks/maintenance/check.yml -i inventories/<site>/hosts.yml
+
+- name: Check system status
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Get disk usage
+      ansible.builtin.command:
+        cmd: df -h /
+      register: disk_usage
+      changed_when: false
+
+    - name: Get memory usage
+      ansible.builtin.command:
+        cmd: free -h
+      register: memory_usage
+      changed_when: false
+
+    - name: Check Docker status
+      ansible.builtin.command:
+        cmd: docker ps --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}"
+      register: docker_status
+      changed_when: false
+      failed_when: false
+
+    - name: Check Tailscale status
+      ansible.builtin.command:
+        cmd: tailscale status
+      register: tailscale_status
+      changed_when: false
+      failed_when: false
+
+    - name: Display system status
+      ansible.builtin.debug:
+        msg:
+          - "=== {{ inventory_hostname }} ==="
+          - "Uptime: {{ (ansible_facts.uptime_seconds / 86400) | round(2) }} days"
+          - ""
+          - "Disk: {{ disk_usage.stdout_lines[1] | default('N/A') }}"
+          - ""
+          - "Memory:"
+          - "{{ memory_usage.stdout_lines[1] | default('N/A') }}"
+          - ""
+          - "Docker containers:"
+          - "{{ docker_status.stdout | default('Docker not running') }}"
+          - ""
+          - "Tailscale: {{ 'Connected' if tailscale_status.rc == 0 else 'Not connected' }}"

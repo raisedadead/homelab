@@ -1,0 +1,35 @@
+---
+# Global defaults - shared across all sites
+# Override in inventories/<site>/group_vars/all.yml for site-specific values
+
+# User configuration
+default_user: malati
+default_user_shell: /bin/bash
+default_user_groups:
+  - sudo
+default_github_users:
+  - raisedadead
+  - prayashm
+
+# Locale
+default_locale_lang: en_US.UTF-8
+default_locale_all: en_US.UTF-8
+default_locale_generate:
+  - en_US.UTF-8 UTF-8
+  - en_IN.UTF-8 UTF-8
+
+# Timezone
+default_timezone: Asia/Kolkata
+
+# Domain
+default_domain: lan.mrugesh.net
+
+# Tailscale
+default_tailscale_tags: "tag:services"
+default_tailscale_ssh: true
+default_tailscale_exit_node: false
+
+# Docker
+docker_edition: ce
+docker_install_compose_plugin: true
+docker_install_compose: false  # Legacy v1, not needed

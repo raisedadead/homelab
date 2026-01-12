@@ -1,0 +1,34 @@
+---
+# Cloudflared tunnel tasks
+
+- name: Validate tunnel token is provided
+  ansible.builtin.fail:
+    msg: "cloudflared_token is required. Set vault_cloudflared_token in your vault file."
+  when: cloudflared_token | length == 0
+
+- name: Create cloudflared directory
+  ansible.builtin.file:
+    path: "{{ cloudflared_deploy_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ cloudflared_deploy_dir }}/docker-compose.yml"
+    mode: "0600"  # Contains token
+  register: cloudflared_compose
+
+- name: Deploy cloudflared container
+  community.docker.docker_compose_v2:
+    project_src: "{{ cloudflared_deploy_dir }}"
+    state: present
+    pull: always
+    recreate: "{{ 'always' if cloudflared_compose.changed else 'never' }}"
+  register: cloudflared_deploy
+
+- name: Display cloudflared status
+  ansible.builtin.debug:
+    msg:
+      - "Cloudflared container: {{ cloudflared_container_name }}"
+      - "Tunnel connected to Cloudflare Zero Trust"

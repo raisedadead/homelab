@@ -1,0 +1,12 @@
+---
+# Docker role defaults (wrapper around geerlingguy.docker)
+
+docker_edition: "{{ docker_edition | default('ce') }}"
+docker_install_compose_plugin: true
+docker_install_compose: false
+docker_users:
+  - "{{ ansible_user }}"
+
+# Pip packages for Ansible docker modules
+pip_install_packages:
+  - name: docker

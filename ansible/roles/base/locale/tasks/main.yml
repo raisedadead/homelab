@@ -1,0 +1,48 @@
+---
+# Locale setup tasks
+
+- name: Ensure locales package is installed
+  ansible.builtin.apt:
+    name: locales
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Generate required locales
+  ansible.builtin.lineinfile:
+    path: /etc/locale.gen
+    regexp: "^#?{{ item | regex_escape }}$"
+    line: "{{ item }}"
+    state: present
+  loop: "{{ locale_generate }}"
+  notify: Run locale-gen
+
+- name: Set default locale
+  ansible.builtin.copy:
+    content: |
+      LANG={{ locale_lang }}
+      LC_ALL={{ locale_all }}
+    dest: /etc/default/locale
+    mode: "0644"
+
+- name: Set locale in /etc/environment
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+    create: true
+    mode: "0644"
+  loop:
+    - { key: "LANG", value: "{{ locale_lang }}" }
+    - { key: "LC_ALL", value: "{{ locale_all }}" }
+
+- name: Create locale profile script
+  ansible.builtin.copy:
+    content: |
+      export LANG={{ locale_lang }}
+      export LC_ALL={{ locale_all }}
+    dest: /etc/profile.d/locale.sh
+    mode: "0644"
+
+- name: Flush handlers to apply locale changes
+  ansible.builtin.meta: flush_handlers

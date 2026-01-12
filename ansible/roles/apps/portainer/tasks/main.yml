@@ -1,0 +1,30 @@
+---
+# Portainer deployment tasks
+
+- name: Create Portainer directory
+  ansible.builtin.file:
+    path: "{{ portainer_deploy_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ portainer_deploy_dir }}/docker-compose.yml"
+    mode: "0644"
+  register: portainer_compose
+
+- name: Deploy Portainer container
+  community.docker.docker_compose_v2:
+    project_src: "{{ portainer_deploy_dir }}"
+    state: present
+    pull: always
+    recreate: "{{ 'always' if portainer_compose.changed else 'never' }}"
+  register: portainer_deploy
+
+- name: Display Portainer access info
+  ansible.builtin.debug:
+    msg:
+      - "Portainer is running!"
+      - "Access at: https://{{ inventory_hostname }}:{{ portainer_port }}"
+      - "Uses self-signed certificate."

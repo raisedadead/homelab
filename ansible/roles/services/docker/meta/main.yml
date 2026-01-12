@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: mrugesh
+  description: Docker CE installation wrapper
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+
+dependencies:
+  - geerlingguy.pip
+  - geerlingguy.docker

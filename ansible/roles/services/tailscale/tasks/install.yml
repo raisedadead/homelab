@@ -1,0 +1,52 @@
+---
+# Tailscale installation tasks
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - gnupg2
+      - apt-transport-https
+      - jq
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Set Tailscale repo variables
+  ansible.builtin.set_fact:
+    tailscale_distro: "{{ ansible_facts['distribution'] | lower }}"
+    tailscale_release: "{{ ansible_facts['distribution_release'] | lower }}"
+    tailscale_keyring_path: /usr/share/keyrings/tailscale-archive-keyring.gpg
+
+- name: Download Tailscale GPG key
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/{{ tailscale_distro }}/{{ tailscale_release }}.noarmor.gpg"
+    dest: "{{ tailscale_keyring_path }}"
+    mode: "0644"
+
+- name: Add Tailscale repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ tailscale_keyring_path }}] https://pkgs.tailscale.com/stable/{{ tailscale_distro }} {{ tailscale_release }} main"
+    state: present
+    filename: tailscale
+
+- name: Install Tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    state: "{{ tailscale_package_state }}"
+    update_cache: true
+
+- name: Enable IP forwarding for subnet routing
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "1"
+    sysctl_file: /etc/sysctl.d/99-tailscale.conf
+    reload: true
+  loop:
+    - net.ipv4.ip_forward
+    - net.ipv6.conf.all.forwarding

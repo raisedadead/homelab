@@ -1,0 +1,8 @@
+---
+# User role defaults
+
+user_name: "{{ default_user | default('malati') }}"
+user_shell: "{{ default_user_shell | default('/bin/bash') }}"
+user_groups: "{{ default_user_groups | default(['sudo']) }}"
+user_github_keys: "{{ default_github_users | default([]) }}"
+user_passwordless_sudo: true

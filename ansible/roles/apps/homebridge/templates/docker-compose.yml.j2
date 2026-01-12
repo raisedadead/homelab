@@ -1,0 +1,15 @@
+services:
+  homebridge:
+    image: {{ homebridge_image }}
+    container_name: {{ homebridge_container_name }}
+    restart: always
+    network_mode: host
+    environment:
+      - TZ={{ homebridge_timezone }}
+    volumes:
+      - ./homebridge:/homebridge
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ homebridge_log_max_size }}"
+        max-file: "{{ homebridge_log_max_file }}"

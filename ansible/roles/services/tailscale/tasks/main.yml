@@ -1,0 +1,14 @@
+---
+# Tailscale main tasks
+
+- name: Install Tailscale
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - tailscale
+    - tailscale-install
+
+- name: Configure Tailscale
+  ansible.builtin.include_tasks: configure.yml
+  tags:
+    - tailscale
+    - tailscale-configure

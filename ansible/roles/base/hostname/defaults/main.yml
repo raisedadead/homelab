@@ -1,0 +1,5 @@
+---
+# Hostname role defaults
+
+hostname_domain: "{{ site_domain | default(default_domain) | default('lan.mrugesh.net') }}"
+hostname_preserve_in_cloud_init: true

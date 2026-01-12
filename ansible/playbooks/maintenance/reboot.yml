@@ -1,0 +1,35 @@
+---
+# Reboot/Shutdown playbook
+# Usage:
+#   Reboot: ansible-playbook playbooks/maintenance/reboot.yml -i inventories/<site>/hosts.yml
+#   Shutdown: ansible-playbook playbooks/maintenance/reboot.yml -i inventories/<site>/hosts.yml -e shutdown=true
+
+- name: Reboot or shutdown hosts
+  hosts: all
+  become: true
+  gather_facts: true
+  serial: "{{ reboot_serial | default(1) }}"
+
+  tasks:
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Display current uptime
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} uptime: {{ (ansible_facts.uptime_seconds / 86400) | round(2) }} days"
+
+    - name: Reboot the host
+      ansible.builtin.reboot:
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 15
+        post_reboot_delay: 15
+        test_command: uptime
+      when: shutdown is not defined or not shutdown
+
+    - name: Shutdown the host
+      community.general.shutdown:
+        delay: 5
+      when: shutdown | default(false) | bool

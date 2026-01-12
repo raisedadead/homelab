@@ -1,0 +1,41 @@
+---
+# Homebridge deployment tasks
+# NOTE: Designed to safely adopt existing containers without recreation
+
+- name: Ensure Homebridge directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - "{{ homebridge_deploy_dir }}"
+    - "{{ homebridge_config_dir }}"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ homebridge_deploy_dir }}/docker-compose.yml"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  register: homebridge_compose
+
+- name: Manage Homebridge container
+  community.docker.docker_compose_v2:
+    project_src: "{{ homebridge_deploy_dir }}"
+    state: present
+    # Only pull if compose file changed, otherwise leave container alone
+    pull: "{{ 'always' if homebridge_compose.changed else 'never' }}"
+    # Never recreate unless compose file changed
+    recreate: "{{ 'always' if homebridge_compose.changed else 'never' }}"
+  register: homebridge_deploy
+
+- name: Display Homebridge status
+  ansible.builtin.debug:
+    msg:
+      - "Homebridge container: {{ homebridge_container_name }}"
+      - "Config dir: {{ homebridge_config_dir }}"
+      - "Web UI: http://{{ inventory_hostname }}:{{ homebridge_port }}"
+      - "Container changed: {{ homebridge_deploy.changed | default(false) }}"

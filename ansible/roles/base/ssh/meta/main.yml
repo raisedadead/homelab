@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: mrugesh
+  description: SSH hardening configuration
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+
+dependencies: []
