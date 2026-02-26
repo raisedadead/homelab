@@ -2,7 +2,7 @@
 collections:
   # Core utilities (shutdown, lineinfile, etc.)
   - name: community.general
-    version: "==12.2.0"
+    version: "==12.4.0"
 
   # Docker management with proper idempotency
   - name: community.docker
