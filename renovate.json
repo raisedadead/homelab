@@ -1,13 +1,34 @@
 {
-  "extends": [
-    "github>raisedadead/renovate-config:default"
-  ],
+  "extends": ["github>raisedadead/renovate-config:default"],
   "packageRules": [
     {
       "groupName": "boto packages",
-      "matchPackageNames": [
-        "/^boto/"
-      ]
+      "matchPackageNames": ["/^boto/"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["ansible/roles/apps/homebridge/defaults/main\\.yml$"],
+      "matchStrings": ["homebridge_version:\\s*\"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "homebridge/homebridge",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "regex:^(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["ansible/roles/apps/homeassistant/defaults/main\\.yml$"],
+      "matchStrings": ["homeassistant_version:\\s*\"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "home-assistant/home-assistant",
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://ghcr.io"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["ansible/roles/apps/portainer/defaults/main\\.yml$"],
+      "matchStrings": ["portainer_version:\\s*\"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "portainer/portainer-ce",
+      "datasourceTemplate": "docker"
     }
   ]
 }

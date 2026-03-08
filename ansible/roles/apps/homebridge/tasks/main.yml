@@ -26,10 +26,14 @@
   community.docker.docker_compose_v2:
     project_src: "{{ homebridge_deploy_dir }}"
     state: present
-    # Only pull if compose file changed, otherwise leave container alone
-    pull: "{{ 'always' if homebridge_compose.changed else 'never' }}"
-    # Never recreate unless compose file changed
-    recreate: "{{ 'always' if homebridge_compose.changed else 'never' }}"
+    pull: >-
+      {{ 'always' if (homebridge_compose.changed or
+      homebridge_force_pull | default(false) | bool)
+      else 'never' }}
+    recreate: >-
+      {{ 'always' if (homebridge_compose.changed or
+      homebridge_force_pull | default(false) | bool)
+      else 'never' }}
   register: homebridge_deploy
 
 - name: Display Homebridge status
