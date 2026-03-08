@@ -5,7 +5,7 @@ description = ""
 requires-python = ">=3.12"
 dependencies = [
   "ansible==13.4.0",
-  "ansible-specdoc==0.0.19",
+  "ansible-specdoc==0.0.20",
   "boto3==1.42.61",
   "botocore==1.42.61",
   "docker==7.1.0",
