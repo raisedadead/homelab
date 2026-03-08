@@ -1,6 +1,6 @@
 {
   "extends": [
-    "github>raisedadead/renovate-config:default"
+    "github>raisedadead/renovate-config"
   ],
   "packageRules": [
     {
