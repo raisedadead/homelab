@@ -8,8 +8,9 @@ homebridge_version: "2026-03-07"
 homebridge_image: "homebridge/homebridge:{{ homebridge_version }}"
 homebridge_force_pull: false
 homebridge_timezone: >-
-  {{ site_timezone | default(default_timezone) | default('UTC') }}
+  {{ site_timezone | default('UTC') }}
 homebridge_port: 8581
+
 # Logging
 homebridge_log_max_size: "10mb"
 homebridge_log_max_file: "1"

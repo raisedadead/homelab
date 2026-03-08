@@ -28,11 +28,11 @@
     state: present
     pull: >-
       {{ 'always' if (homebridge_compose.changed or
-      homebridge_force_pull | default(false) | bool)
+      homebridge_force_pull | bool)
       else 'never' }}
     recreate: >-
       {{ 'always' if (homebridge_compose.changed or
-      homebridge_force_pull | default(false) | bool)
+      homebridge_force_pull | bool)
       else 'never' }}
   register: homebridge_deploy
 
