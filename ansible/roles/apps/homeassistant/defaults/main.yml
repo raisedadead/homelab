@@ -1,7 +1,7 @@
 ---
 # Home Assistant role defaults
 
-homeassistant_version: "2026.3.1"
+homeassistant_version: "2026.3.3"
 homeassistant_timezone: >-
   {{ site_timezone | default('UTC') }}
 homeassistant_config_dir: "/home/{{ ansible_user }}/homeassistant"
