@@ -6,6 +6,7 @@
 #   - portainer: Portainer CE
 #   - homeassistant: Home Assistant
 #   - homebridge: Homebridge (HomeKit bridge)
+#   - scrypted: Scrypted (RTSP -> HomeKit + HSV)
 
 - name: Deploy container applications
   hosts: all
@@ -24,6 +25,10 @@
     - role: apps/homebridge
       tags: [apps, homebridge]
       when: "'homebridge_stack' in group_names or 'homebridge' in (deploy_apps | default([]))"
+
+    - role: apps/scrypted
+      tags: [apps, scrypted]
+      when: "'scrypted_stack' in group_names or 'scrypted' in (deploy_apps | default([]))"
 
   post_tasks:
     - name: Display apps status

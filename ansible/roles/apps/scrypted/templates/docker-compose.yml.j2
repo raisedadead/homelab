@@ -1,0 +1,15 @@
+services:
+  scrypted:
+    image: {{ scrypted_image }}
+    container_name: {{ scrypted_container_name }}
+    restart: always
+    network_mode: host
+    environment:
+      - TZ={{ scrypted_timezone }}
+    volumes:
+      - ./volume:/server/volume
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ scrypted_log_max_size }}"
+        max-file: "{{ scrypted_log_max_file }}"

@@ -16,3 +16,7 @@ homebridge_image: homebridge/homebridge:latest # match live; role default pins a
 homebridge_deploy_dir: /home/mrugesh/homebridge
 homebridge_config_dir: /home/mrugesh/homebridge/homebridge
 homebridge_timezone: Asia/Kolkata
+
+# Scrypted
+scrypted_deploy_dir: /home/mrugesh/scrypted
+scrypted_timezone: Asia/Kolkata

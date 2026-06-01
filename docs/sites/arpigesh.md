@@ -37,11 +37,22 @@ Primary site (home).
 - **Purpose**: HomeKit bridge for non-HomeKit smart devices
 - **Web UI**: `http://home:8581`
 
+### Scrypted
+
+- **Host**: `home`
+- **Container**: `ghcr.io/koush/scrypted:v0.143.0`
+- **Access**: Tailscale MagicDNS (admin only)
+- **Purpose**: RTSP -> HomeKit + HSV
+- **Web UI**: `https://home:10443`
+- **Runbook**: [Scrypted Camera](../runbooks/scrypted-camera.md)
+
 ## Network
 
 - LAN: `192.168.1.200/24` on `wlan0` (WiFi; dual-ethernet ports unused — verify static vs DHCP reservation)
 - Tailscale: Connected (`home`, `100.110.43.91`); offers exit node
 - Subnet `192.168.1.0/24` — reserve `.201` for the play-area camera phone
+- Camera node: Nothing Phone 1 (`192.168.1.201`, Android IP Webcam, RTSP source) — LAN-only, zero WAN egress
+- Apple TV home hub (`100.69.144.110`) — HomeKit Secure Video E2E to iCloud+
 
 ## Ansible Inventory
 

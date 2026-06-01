@@ -1,0 +1,15 @@
+---
+# Scrypted role defaults
+
+scrypted_deploy_dir: "/home/{{ ansible_user }}/scrypted"
+scrypted_volume_dir: "{{ scrypted_deploy_dir }}/volume"
+scrypted_container_name: scrypted
+scrypted_version: "v0.143.0-noble-full"
+scrypted_image: "ghcr.io/koush/scrypted:{{ scrypted_version }}"
+scrypted_force_pull: false
+scrypted_timezone: "{{ site_timezone | default('UTC') }}"
+scrypted_port: 10443
+
+# Logging
+scrypted_log_max_size: "10mb"
+scrypted_log_max_file: "1"

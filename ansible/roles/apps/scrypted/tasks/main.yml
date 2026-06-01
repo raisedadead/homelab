@@ -1,0 +1,36 @@
+---
+- name: Ensure Scrypted directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - "{{ scrypted_deploy_dir }}"
+    - "{{ scrypted_volume_dir }}"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ scrypted_deploy_dir }}/docker-compose.yml"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  register: scrypted_compose
+
+- name: Manage Scrypted container
+  community.docker.docker_compose_v2:
+    project_src: "{{ scrypted_deploy_dir }}"
+    state: present
+    pull: "{{ 'always' if (scrypted_compose.changed or scrypted_force_pull | bool) else 'never' }}"
+    recreate: "{{ 'always' if (scrypted_compose.changed or scrypted_force_pull | bool) else 'never' }}"
+  register: scrypted_deploy
+
+- name: Display Scrypted status
+  ansible.builtin.debug:
+    msg:
+      - "Scrypted container: {{ scrypted_container_name }}"
+      - "Volume dir: {{ scrypted_volume_dir }}"
+      - "Web UI: https://{{ inventory_hostname }}:{{ scrypted_port }}"
+      - "Container changed: {{ scrypted_deploy.changed | default(false) }}"
