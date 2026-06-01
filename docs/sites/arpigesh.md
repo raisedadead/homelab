@@ -7,21 +7,22 @@ Primary site (home).
 ### DeskPi Super6C Cluster
 
 | Slot | Module | Hostname | Services |
-|------|--------|----------|----------|
-| 1 | CM4 | TBD | TBD |
-| 2 | CM4 | TBD | TBD |
-| 3 | CM4 | TBD | TBD |
-| 4 | CM4 | TBD | TBD |
-| 5 | CM4 | TBD | TBD |
-| 6 | CM4 | TBD | TBD |
+| ---- | ------ | -------- | -------- |
+| 1    | CM4    | TBD      | TBD      |
+| 2    | CM4    | TBD      | TBD      |
+| 3    | CM4    | TBD      | TBD      |
+| 4    | CM4    | TBD      | TBD      |
+| 5    | CM4    | TBD      | TBD      |
+| 6    | CM4    | TBD      | TBD      |
 
 ### Standalone Devices
 
-| Device | Board | Hostname | OS | Services |
-|--------|-------|----------|-----|----------|
-| Raspberry Pi CM4 | Waveshare CM4-DUAL-ETH-MINI | `home` | Debian Bookworm (aarch64) | Homebridge |
+| Device           | Board                       | Hostname | OS                        | Services   |
+| ---------------- | --------------------------- | -------- | ------------------------- | ---------- |
+| Raspberry Pi CM4 | Waveshare CM4-DUAL-ETH-MINI | `home`   | Debian Bookworm (aarch64) | Homebridge |
 
 #### CM4-DUAL-ETH-MINI Specs
+
 - Dual Gigabit Ethernet ports
 - Compact form factor with case
 - Kernel: 6.12.x (rpi-v8)
@@ -38,8 +39,9 @@ Primary site (home).
 
 ## Network
 
-- LAN: DHCP
-- Tailscale: Connected (`home`)
+- LAN: `192.168.1.200/24` on `wlan0` (WiFi; dual-ethernet ports unused — verify static vs DHCP reservation)
+- Tailscale: Connected (`home`, `100.110.43.91`); offers exit node
+- Subnet `192.168.1.0/24` — reserve `.201` for the play-area camera phone
 
 ## Ansible Inventory
 
@@ -59,7 +61,7 @@ all:
 ## Rebuild
 
 1. Flash Raspberry Pi OS (64-bit, Lite) to SD/eMMC
-2. Enable SSH, configure WiFi if needed
-3. Bootstrap: `make bootstrap SITE=arpigesh HOST=home`
-4. Services: `make services SITE=arpigesh`
-5. Deploy Homebridge manually or add role
+1. Enable SSH, configure WiFi if needed
+1. Bootstrap: `make bootstrap SITE=arpigesh HOST=home`
+1. Services: `make services SITE=arpigesh`
+1. Deploy Homebridge manually or add role
