@@ -4,7 +4,7 @@
 homebridge_deploy_dir: "/home/{{ ansible_user }}/homebridge"
 homebridge_config_dir: "{{ homebridge_deploy_dir }}/homebridge"
 homebridge_container_name: homebridge
-homebridge_version: "2026-03-07"
+homebridge_version: "2026-08-28"
 homebridge_image: "homebridge/homebridge:{{ homebridge_version }}"
 homebridge_force_pull: false
 homebridge_timezone: >-
