@@ -18,6 +18,7 @@
 ### Runbooks
 - [Ansible Playbooks](runbooks/ansible-playbooks.md) - Configuration management
 - [Bootstrap](runbooks/bootstrap.md) - New host setup
+- [Mac Personal Tailnet](runbooks/mac-personal-tailnet.md) - Personal tailnet from a work Mac
 
 ### Reference
 - [Tailscale](reference/tailscale.md) - Mesh VPN, serve config
